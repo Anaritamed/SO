@@ -57,9 +57,14 @@ Usada para transmitir os volumes de dados da memória do dispositivo E/S para a 
 
 ## Exercício
 
-1) Suponha que um processo abra com sucesso um arquivo existente que tenha um único hard link para ele, mas enquanto o processo está lendo esse arquivo, outro processo desvincula esse arquivo. O que deve acontecer com as leituras subsequentes do primeiro processo? Elas devem ter sucesso? Elas devem falhar? Por quê?  
+1) Suponha que um processo abra com sucesso um arquivo existente que tenha um único hard link para ele, mas enquanto o processo está lendo esse arquivo, outro processo desvincula esse arquivo. O que deve acontecer com as leituras subsequentes do primeiro processo? Elas devem ter sucesso? Elas devem falhar? Por quê?
+   <details>
+   <summary> Resposta </summary>
     - Se um processo abre um arquivo que possui apenas um hard link e, enquanto o lê, outro processo remove esse link com `unlink()`, as leituras continuarão funcionando normalmente. Isso porque, em sistemas como Unix/Linux, `unlink()` remove apenas o nome do arquivo do diretório, mas o conteúdo do arquivo — controlado pelo inode — permanece acessível enquanto houver descritores de arquivo abertos. Assim, o processo que abriu o arquivo antes da remoção pode continuar lendo seu conteúdo sem falhas.
+    </details>
 
-2) Considere um editor de texto que salva um arquivo sempre que você clica no botão de salvar. Suponha que, ao pressionar esse botão, o editor simplesmente (1) anima o evento de pressionar o botão (por exemplo, colorindo o botão de cinza), (2) usa a chamada de sistema `write()` para gravar seu texto no arquivo e então (3) anima o evento de soltar o botão (por exemplo, colorindo o botão de branco). O que de ruim pode acontecer se um usuário editar um arquivo, salvá-lo e então desligar o computador diretamente pelo botão de energia (em vez de desligar o sistema corretamente)?  
+3) Considere um editor de texto que salva um arquivo sempre que você clica no botão de salvar. Suponha que, ao pressionar esse botão, o editor simplesmente (1) anima o evento de pressionar o botão (por exemplo, colorindo o botão de cinza), (2) usa a chamada de sistema `write()` para gravar seu texto no arquivo e então (3) anima o evento de soltar o botão (por exemplo, colorindo o botão de branco). O que de ruim pode acontecer se um usuário editar um arquivo, salvá-lo e então desligar o computador diretamente pelo botão de energia (em vez de desligar o sistema corretamente)? 
+	<details>
+	<summary> Resposta </summary>
     - Se o editor de texto usa apenas a chamada `write()` para salvar o arquivo, mas não força a gravação no disco, há um risco real de perda de dados. Isso acontece porque o sistema operacional pode manter os dados apenas em cache por um tempo, mesmo após a conclusão da write(). Assim, se o usuário desligar a máquina abruptamente logo após clicar em salvar, o conteúdo pode nunca ter sido escrito fisicamente no disco, resultando em perda ou corrupção do arquivo. Para garantir a integridade dos dados, o editor deveria forçar a sincronização com o disco antes de indicar que o salvamento foi concluído.
-	 
+	</details> 
